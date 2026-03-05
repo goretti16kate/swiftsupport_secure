@@ -1,0 +1,514 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - SwiftSupport{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar Navigation -->
+        <nav class="col-md-3 col-lg-2 d-md-block sidebar" style="background: #0E1825;">
+            <div class="position-sticky pt-3">
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/customer/dashboard">
+                            <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/customer/tickets">
+                            <i class="fas fa-ticket-alt me-2"></i>My Tickets
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/customer/new-ticket">
+                            <i class="fas fa-plus-circle me-2"></i>New Ticket
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/customer/knowledge-base">
+                            <i class="fas fa-book me-2"></i>Knowledge Base
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/customer/billing">
+                            <i class="fas fa-credit-card me-2"></i>Billing
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/customer/profile">
+                            <i class="fas fa-user me-2"></i>Profile
+                        </a>
+                    </li>
+                    <li class="nav-item mt-4">
+                        <hr>
+                        <span class="sidebar-heading px-3 mt-4 mb-1 text-muted">
+                            <i class="fas fa-cog me-2"></i>Support
+                        </span>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-muted" href="#">
+                            <i class="fas fa-question-circle me-2"></i>Help Center
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-muted" href="#">
+                            <i class="fas fa-comment me-2"></i>Live Chat
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+        
+
+        <!-- Main Content -->
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+            <!-- Top Navigation Bar -->
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                <h1 class="h2">Welcome back, {{ user.full_name }}!</h1>
+                <div class="btn-toolbar mb-2 mb-md-0">
+                    <!-- Notification Bell -->
+                    <div class="dropdown me-2">
+                        <button class="btn btn-outline-secondary position-relative" type="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-bell"></i>
+                            {% if unread_count > 0 %}
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                {{ unread_count }}
+                            </span>
+                            {% endif %}
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-end notification-dropdown" style="width: 300px;">
+                            <h6 class="dropdown-header">Notifications</h6>
+                            {% if notifications %}
+                                {% for notif in notifications %}
+                                <a class="dropdown-item" href="{{ notif.link }}">
+                                    <div class="d-flex align-items-center">
+                                        <div class="me-3">
+                                            {% if notif.type == 'success' %}
+                                            <i class="fas fa-check-circle text-success"></i>
+                                            {% elif notif.type == 'warning' %}
+                                            <i class="fas fa-exclamation-triangle text-warning"></i>
+                                            {% elif notif.type == 'danger' %}
+                                            <i class="fas fa-times-circle text-danger"></i>
+                                            {% else %}
+                                            <i class="fas fa-info-circle text-info"></i>
+                                            {% endif %}
+                                        </div>
+                                        <div>
+                                            <small class="fw-bold">{{ notif.title }}</small>
+                                            <p class="small text-muted mb-0">{{ notif.message[:50] }}...</p>
+                                            <small class="text-muted">{{ notif.created_at.strftime('%H:%M') }}</small>
+                                        </div>
+                                    </div>
+                                </a>
+                                {% endfor %}
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item text-center small" href="#">Mark all as read</a>
+                            {% else %}
+                                <span class="dropdown-item text-muted">No new notifications</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- User Profile Dropdown -->
+                    <div class="dropdown">
+                        <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-user-circle me-2"></i>{{ user.username }}
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="/customer/profile"><i class="fas fa-user me-2"></i>Profile</a></li>
+                            <li><a class="dropdown-item" href="/customer/settings"><i class="fas fa-cog me-2"></i>Settings</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item text-danger" href="/logout"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- System Status Banner -->
+            <div class="alert alert-info alert-dismissible fade show" role="alert">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-info-circle me-2 fa-lg"></i>
+                    <div class="flex-grow-1">
+                        <strong>System Status:</strong>
+                        {% if system_status.support == 'operational' %}
+                        <span class="badge bg-success me-2">Support: Online</span>
+                        {% else %}
+                        <span class="badge bg-danger me-2">Support: Issues</span>
+                        {% endif %}
+                        
+                        {% if system_status.api == 'operational' %}
+                        <span class="badge bg-success me-2">API: Online</span>
+                        {% else %}
+                        <span class="badge bg-danger me-2">API: Issues</span>
+                        {% endif %}
+                        
+                        {% if system_status.portal == 'operational' %}
+                        <span class="badge bg-success me-2">Portal: Online</span>
+                        {% else %}
+                        <span class="badge bg-danger me-2">Portal: Issues</span>
+                        {% endif %}
+                        
+                        {% if system_status.database == 'degraded' %}
+                        <span class="badge bg-warning">Database: Degraded Performance</span>
+                        {% endif %}
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            </div>
+
+            <!-- Quick Stats Cards -->
+            <div class="row mb-4">
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card border-left-primary shadow h-100 py-2">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                        Total Tickets</div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ stats.total_tickets }}</div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-ticket-alt fa-2x text-gray-300"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card border-left-warning shadow h-100 py-2">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                        Open Tickets</div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ stats.open_tickets }}</div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-clock fa-2x text-gray-300"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card border-left-success shadow h-100 py-2">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                        Resolved This Month</div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ stats.resolved_this_month }}</div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-check-circle fa-2x text-gray-300"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card border-left-info shadow h-100 py-2">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                        Avg Response Time</div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ stats.avg_response_time }}h</div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-stopwatch fa-2x text-gray-300"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Quick Actions</h5>
+                            <a href="/customer/new-ticket" class="btn btn-primary me-2">
+                                <i class="fas fa-plus-circle me-2"></i>New Ticket
+                            </a>
+                            <a href="/customer/knowledge-base" class="btn btn-outline-primary me-2">
+                                <i class="fas fa-book me-2"></i>Knowledge Base
+                            </a>
+                            <a href="/customer/billing" class="btn btn-outline-primary">
+                                <i class="fas fa-credit-card me-2"></i>Billing
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+        <!-- Network Diagnostics Card - VULNERABLE TO COMMAND INJECTION -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card border-warning">
+            <div class="card-header bg-warning text-dark">
+                <i class="fas fa-network-wired me-2"></i>
+                <strong>Network Diagnostics Tool</strong>
+                
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-8">
+                        <p class="text-muted">Use this tool to check if your website or server is reachable. 
+                           Enter a domain or IP address to ping.</p>
+                        
+                        <form method="POST" action="/customer/ping" class="row g-3">
+                            <div class="col-md-8">
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-globe"></i></span>
+                                    <input type="text" class="form-control" name="host" 
+                                           placeholder="Enter hostname or IP (e.g., google.com or 8.8.8.8)" 
+                                           value="8.8.8.8" required>
+                                </div>
+                            
+                            </div>
+                            <div class="col-md-4">
+                                <button type="submit" class="btn btn-warning w-100">
+                                    <i class="fas fa-play me-2"></i>Run Ping Test
+                                </button>
+                            </div>
+                        </form>
+                        
+                        <!-- Results area (will be populated from session) -->
+                        {% if session.get('ping_result') %}
+                        <div class="mt-4">
+                                                        <div class="alert {% if session.get('ping_status') == 'UP' %}alert-success{% elif session.get('ping_status') == 'DOWN' %}alert-danger{% else %}alert-secondary{% endif %} mb-3">
+                                <div class="d-flex align-items-center">
+                                    <div class="me-3">
+                                        {% if session.get('ping_status') == 'UP' %}
+                                            <i class="fas fa-check-circle fa-2x"></i>
+                                        {% elif session.get('ping_status') == 'DOWN' %}
+                                            <i class="fas fa-times-circle fa-2x"></i>
+                                        {% else %}
+                                            <i class="fas fa-question-circle fa-2x"></i>
+                                        {% endif %}
+                                    </div>
+                                    <div>
+                                        <h6 class="mb-0">
+                                            {% if session.get('ping_status') == 'UP' %}
+                                                🟢 SITE IS UP! 
+                                            {% elif session.get('ping_status') == 'DOWN' %}
+                                                🔴 SITE IS DOWN! 
+                                            {% else %}
+                                                ⚪ STATUS UNKNOWN 
+                                            {% endif %}
+                                        </h6>
+                                        <p class="mb-0 target">
+                                            Target: <strong>{{ session.get('ping_target', '') }}</strong>
+                                            {% if session.get('ping_time') %}
+                                                | Response: {{ session.get('ping_time') }}
+                                            {% endif %}
+                                            {% if session.get('ping_packets') %}
+                                                | Packets: {{ session.get('ping_packets') }}
+                                            {% endif %}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            <h6>Ping Results:</h6>
+                            <pre class="bg-dark text-success p-3 rounded" style="max-height: 300px; overflow-y: auto;">{{ session.pop('ping_result', '') }}</pre>
+                        </div>
+                        {% endif %}
+                        
+                        {% if session.get('ping_error') %}
+                        <div class="mt-4">
+                            <div class="alert alert-danger">
+                                <i class="fas fa-exclamation-circle me-2"></i>
+                                {{ session.pop('ping_error', '') }}
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+            <div class="row">
+                <!-- Recent Tickets -->
+                <div class="col-lg-7 mb-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <i class="fas fa-ticket-alt me-1"></i>
+                            Recent Tickets
+                            <a href="/customer/tickets" class="btn btn-sm btn-outline-primary float-end">View All</a>
+                        </div>
+                        <div class="card-body">
+                            {% if recent_tickets %}
+                            <div class="list-group">
+                                {% for ticket in recent_tickets %}
+                                <a href="/customer/ticket/{{ ticket.ticket_number }}" class="list-group-item list-group-item-action">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h6 class="mb-1">{{ ticket.subject }}</h6>
+                                        <small class="text-muted">{{ ticket.created_at.strftime('%Y-%m-%d') }}</small>
+                                    </div>
+                                    <p class="mb-1 text-truncate">{{ ticket.description[:100] }}</p>
+                                    <small>
+                                        <span class="badge {% if ticket.status == 'Open' %}bg-warning{% elif ticket.status == 'In Progress' %}bg-info{% elif ticket.status == 'Resolved' %}bg-success{% else %}bg-secondary{% endif %}">
+                                            {{ ticket.status }}
+                                        </span>
+                                        <span class="badge {% if ticket.priority == 'High' %}bg-danger{% elif ticket.priority == 'Medium' %}bg-warning{% else %}bg-info{% endif %} ms-1">
+                                            {{ ticket.priority }}
+                                        </span>
+                                        <span class="text-muted ms-2">#{{ ticket.ticket_number }}</span>
+                                    </small>
+                                </a>
+                                {% endfor %}
+                            </div>
+                            {% else %}
+                            <p class="text-muted mb-0">No tickets found.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Announcements and Maintenance -->
+                <div class="col-lg-5 mb-4">
+                    <!-- Announcements -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <i class="fas fa-bullhorn me-1"></i>
+                            Announcements
+                        </div>
+                        <div class="card-body">
+                            {% if announcements %}
+                            <div class="list-group">
+                                {% for announcement in announcements %}
+                                <div class="list-group-item">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h6 class="mb-1">
+                                            {% if announcement.priority == 'high' %}
+                                            <i class="fas fa-exclamation-circle text-danger me-1"></i>
+                                            {% endif %}
+                                            {{ announcement.title }}
+                                        </h6>
+                                        <small class="text-muted">{{ announcement.created_at.strftime('%b %d') }}</small>
+                                    </div>
+                                    <p class="mb-1 small">{{ announcement.content }}</p>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {% else %}
+                            <p class="text-muted mb-0">No announcements at this time.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Upcoming Maintenance -->
+                    <div class="card">
+                        <div class="card-header">
+                            <i class="fas fa-tools me-1"></i>
+                            Upcoming Maintenance
+                        </div>
+                        <div class="card-body">
+                            {% if upcoming_maintenance %}
+                            <div class="list-group">
+                                {% for maintenance in upcoming_maintenance %}
+                                <div class="list-group-item">
+                                    <h6 class="mb-1">{{ maintenance.title }}</h6>
+                                    <p class="mb-1 small">{{ maintenance.description }}</p>
+                                    <small class="text-warning">
+                                        <i class="fas fa-clock me-1"></i>
+                                        {{ maintenance.scheduled_start.strftime('%b %d, %H:%M') }} - 
+                                        {{ maintenance.scheduled_end.strftime('%H:%M UTC') }}
+                                    </small>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {% else %}
+                            <p class="text-muted mb-0">No scheduled maintenance.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Support Hours -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="card bg-light">
+                        <div class="card-body">
+                            <div class="row align-items-center">
+                                <div class="col-md-8">
+                                    <h5><i class="fas fa-clock me-2"></i>Support Hours</h5>
+                                    <p class="mb-0">Monday - Friday: 24/7 | Saturday: 8AM - 8PM EST | Sunday: 10AM - 6PM EST</p>
+                                </div>
+                                <div class="col-md-4 text-md-end">
+                                    <span class="badge bg-success p-3">
+                                        <i class="fas fa-comment me-2"></i>Live Chat Available
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<style>
+.border-left-primary {
+    border-left: 4px solid #4e73df;
+}
+.border-left-success {
+    border-left: 4px solid #1cc88a;
+}
+.border-left-info {
+    border-left: 4px solid #36b9cc;
+}
+.border-left-warning {
+    border-left: 4px solid #f6c23e;
+}
+.border-left-danger {
+    border-left: 4px solid #e74a3b;
+}
+.sidebar {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 100;
+    padding: 48px 0 0;
+    box-shadow: inset -1px 0 0 rgba(0, 0, 0, .1);
+}
+.sidebar .nav-link {
+    font-weight: 500;
+    color: #FFFFFF;
+}
+.sidebar .nav-link.active {
+    color: #589AB6;
+}
+.notification-dropdown {
+    max-height: 400px;
+    overflow-y: auto;
+}
+</style>
+
+<script>
+// Mark notification as read when clicked
+document.querySelectorAll('.notification-item').forEach(item => {
+    item.addEventListener('click', function(e) {
+        const notificationId = this.dataset.id;
+        fetch(`/customer/notifications/mark-read/${notificationId}`, {
+            method: 'POST'
+        });
+    });
+});
+</script>
+{% endblock %}

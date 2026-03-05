@@ -1,0 +1,168 @@
+{% extends "base.html" %}
+
+{% block title %}Server Error - SwiftSupport{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow-lg border-0">
+                <div class="card-body text-center p-5">
+                    <!-- Error Icon -->
+                    <div class="mb-4">
+                        <i class="fas fa-cog fa-spin text-danger" style="font-size: 5rem;"></i>
+                        <i class="fas fa-cog fa-spin fa-2x text-warning" style="position: relative; left: -20px;"></i>
+                    </div>
+                    
+                    <!-- Error Code -->
+                    <h1 class="display-1 fw-bold text-danger">500</h1>
+                    
+                    <!-- Error Title -->
+                    <h2 class="h3 mb-3">Internal Server Error</h2>
+                    
+                    <!-- Error Message -->
+                    <p class="text-muted mb-4">
+                        Something went wrong on our end. Our technical team has been notified and is working on it.
+                    </p>
+                    
+                    <!-- What Happened -->
+                    <div class="bg-light p-4 rounded mb-4">
+                        <h6 class="mb-3"><i class="fas fa-clock me-2 text-warning"></i>What happened?</h6>
+                        <p class="small text-muted mb-0">
+                            An unexpected error occurred while processing your request. This is usually temporary and our team is already working to resolve the issue.
+                        </p>
+                    </div>
+                    
+                    <!-- Error ID (useful for debugging) -->
+                    <div class="mb-4">
+                        <span class="badge bg-secondary p-2">
+                            Error Reference: ERR-{{ range(10000, 99999) | random }}
+                        </span>
+                    </div>
+                    
+                    <!-- Action Buttons -->
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                        <button onclick="location.reload()" class="btn btn-outline-warning me-md-2">
+                            <i class="fas fa-sync-alt me-2"></i>Try Again
+                        </button>
+                        <a href="/customer/dashboard" class="btn btn-primary">
+                            <i class="fas fa-home me-2"></i>Go to Dashboard
+                        </a>
+                    </div>
+                    
+                    <!-- Support Options -->
+                    <hr class="my-4">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <a href="/customer/new-ticket" class="text-decoration-none">
+                                <div class="p-3 border rounded">
+                                    <i class="fas fa-ticket-alt fa-2x text-primary mb-2"></i>
+                                    <h6>Create Ticket</h6>
+                                    <p class="small text-muted mb-0">Report this issue to support</p>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="col-md-6">
+                            <a href="/customer/knowledge-base" class="text-decoration-none">
+                                <div class="p-3 border rounded">
+                                    <i class="fas fa-book fa-2x text-success mb-2"></i>
+                                    <h6>Check Status</h6>
+                                    <p class="small text-muted mb-0">View system status page</p>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Status Information -->
+            <div class="text-center mt-4">
+                <div class="alert alert-warning" role="alert">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-exclamation-triangle me-3 fa-2x"></i>
+                        <div class="text-start">
+                            <strong>System Status:</strong><br>
+                            <span class="badge bg-success me-1">Support: Online</span>
+                            <span class="badge bg-success me-1">API: Online</span>
+                            <span class="badge bg-warning">Database: Degraded</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Troubleshooting Tips -->
+            <div class="card border-0 bg-light mt-3">
+                <div class="card-body">
+                    <h6><i class="fas fa-lightbulb text-warning me-2"></i>Quick Tips:</h6>
+                    <ul class="small text-muted mb-0">
+                        <li>Wait a few minutes and try again</li>
+                        <li>Clear your browser cache and cookies</li>
+                        <li>Try accessing from a different browser</li>
+                        <li>Check our <a href="/customer/knowledge-base">status page</a> for updates</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.card {
+    border-radius: 15px;
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fa-cog {
+    animation-duration: 3s;
+}
+
+.bg-light {
+    background-color: #f8f9fc !important;
+}
+
+.btn {
+    border-radius: 8px;
+    padding: 0.5rem 1.5rem;
+}
+
+.border {
+    transition: all 0.3s ease;
+    border-color: #dee2e6 !important;
+}
+
+.border:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    border-color: #4e73df !important;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+</style>
+
+<script>
+// Auto-refresh after 30 seconds (optional)
+setTimeout(function() {
+    if (confirm('Would you like to try reloading the page?')) {
+        location.reload();
+    }
+}, 30000);
+</script>
+{% endblock %}

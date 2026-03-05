@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+
+{% block title %}Login - SwiftSupport{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+        <div class="card shadow-lg border-0 rounded-lg">
+            <div class="card-header bg-white text-center py-4">
+                <h3 class="mb-0"><i class="fas fa-lock me-2"></i>Customer Login</h3>
+                <p class="text-muted mt-2">Access your support portal</p>
+            </div>
+            <div class="card-body p-4">
+                <!-- Login Form -->
+                <form method="POST" action="/login">
+                    <div class="mb-3">
+                        <label for="username" class="form-label">
+                            <i class="fas fa-user me-2"></i>Username
+                        </label>
+                        <input type="text" class="form-control" id="username" name="username" 
+                               placeholder="Enter your username" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="password" class="form-label">
+                            <i class="fas fa-key me-2"></i>Password
+                        </label>
+                        <input type="password" class="form-control" id="password" name="password" 
+                               placeholder="Enter your password" required>
+                    </div>
+                    
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="remember" name="remember">
+                        <label class="form-check-label" for="remember">Remember me</label>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="fas fa-sign-in-alt me-2"></i>Login
+                        </button>
+                    </div>
+                </form>
+                
+                <!-- Demo Credentials -->
+                <div class="alert alert-info mt-4">
+                    <h6 class="alert-heading"><i class="fas fa-flask me-2"></i>Demo Credentials:</h6>
+                    <hr>
+                    <p class="mb-1"><strong>Regular User:</strong> john_doe / password123</p>
+                    <p class="mb-1"><strong>Regular User:</strong> jane_smith / password456</p>
+                    <p class="mb-0"><strong>Admin User:</strong> admin / admin123</p>
+                </div>
+                
+                <div class="text-center mt-3">
+                    <p class="mb-1">
+                        <a href="/forgot-password" class="text-decoration-none">
+                            <i class="fas fa-question-circle me-1"></i>Forgot Password?
+                        </a>
+                    </p>
+                    <p class="mb-0">
+                        New customer? <a href="/register" class="text-decoration-none">Register here</a>
+                    </p>
+                </div>
+            </div>
+            
+            <!-- SSO Options (Visual only) -->
+            <div class="card-footer bg-white py-3">
+                <div class="text-center text-muted mb-2">Or login with</div>
+                <div class="row g-2">
+                    <div class="col-6">
+                        <button class="btn btn-outline-secondary w-100" disabled>
+                            <i class="fab fa-google me-2"></i>Google
+                        </button>
+                    </div>
+                    <div class="col-6">
+                        <button class="btn btn-outline-secondary w-100" disabled>
+                            <i class="fab fa-microsoft me-2"></i>Microsoft
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- System Status -->
+        <div class="card mt-4 border-0 bg-light">
+            <div class="card-body">
+                <h6><i class="fas fa-check-circle text-success me-2"></i>System Status</h6>
+                <div class="row text-center">
+                    <div class="col-4">
+                        <small class="text-muted">Support</small><br>
+                        <span class="badge bg-success">Online</span>
+                    </div>
+                    <div class="col-4">
+                        <small class="text-muted">Ticketing</small><br>
+                        <span class="badge bg-success">Online</span>
+                    </div>
+                    <div class="col-4">
+                        <small class="text-muted">API</small><br>
+                        <span class="badge bg-success">Online</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Security Notice -->
+        <div class="text-center mt-3">
+            <small class="text-muted">
+                <i class="fas fa-shield-alt me-1"></i>
+                This site is protected by enterprise-grade security
+            </small>
+        </div>
+    </div>
+</div>
+{% endblock %}

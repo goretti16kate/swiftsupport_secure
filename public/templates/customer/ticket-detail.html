@@ -1,0 +1,277 @@
+{% extends "base.html" %}
+
+{% block title %}Ticket {{ ticket.ticket_number }} - SwiftSupport{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar Navigation -->
+        <nav class="col-md-3 col-lg-2 d-md-block sidebar" style="background: #0E1825;">
+            <div class="position-sticky pt-3">
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/customer/dashboard">
+                            <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/customer/tickets">
+                            <i class="fas fa-ticket-alt me-2"></i>My Tickets
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/customer/new-ticket">
+                            <i class="fas fa-plus-circle me-2"></i>New Ticket
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/customer/knowledge-base">
+                            <i class="fas fa-book me-2"></i>Knowledge Base
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/customer/billing">
+                            <i class="fas fa-credit-card me-2"></i>Billing
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/customer/profile">
+                            <i class="fas fa-user me-2"></i>Profile
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+            <!-- Header with actions -->
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                <div>
+                    <h1 class="h2">
+                        Ticket #{{ ticket.ticket_number }}
+                        <small class="text-muted fs-6 ms-2">{{ ticket.category }}</small>
+                    </h1>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="/customer/dashboard">Dashboard</a></li>
+                            <li class="breadcrumb-item"><a href="/customer/tickets">Tickets</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">{{ ticket.ticket_number }}</li>
+                        </ol>
+                    </nav>
+                </div>
+                <div class="btn-toolbar mb-2 mb-md-0">
+                    <a href="/customer/tickets" class="btn btn-outline-secondary me-2">
+                        <i class="fas fa-arrow-left me-2"></i>Back
+                    </a>
+                    
+                    {% if ticket.status != 'Closed' %}
+                    <form method="POST" action="/customer/ticket/{{ ticket.ticket_number }}/close" class="d-inline">
+                        <button type="submit" class="btn btn-outline-warning" 
+                                onclick="return confirm('Are you sure you want to close this ticket?')">
+                            <i class="fas fa-check-circle me-2"></i>Close Ticket
+                        </button>
+                    </form>
+                    {% else %}
+                    <form method="POST" action="/customer/ticket/{{ ticket.ticket_number }}/reopen" class="d-inline">
+                        <button type="submit" class="btn btn-outline-success">
+                            <i class="fas fa-redo-alt me-2"></i>Reopen Ticket
+                        </button>
+                    </form>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Ticket Status Bar -->
+            <div class="row mb-4">
+                <div class="col-md-3">
+                    <div class="card bg-light">
+                        <div class="card-body">
+                            <h6 class="card-title text-muted">Status</h6>
+                            {% if ticket.status == 'Open' %}
+                            <span class="badge bg-warning p-2">Open</span>
+                            {% elif ticket.status == 'In Progress' %}
+                            <span class="badge bg-info p-2">In Progress</span>
+                            {% elif ticket.status == 'Resolved' %}
+                            <span class="badge bg-success p-2">Resolved</span>
+                            {% elif ticket.status == 'Closed' %}
+                            <span class="badge bg-secondary p-2">Closed</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-light">
+                        <div class="card-body">
+                            <h6 class="card-title text-muted">Priority</h6>
+                            {% if ticket.priority == 'High' %}
+                            <span class="badge bg-danger p-2">High</span>
+                            {% elif ticket.priority == 'Medium' %}
+                            <span class="badge bg-warning p-2">Medium</span>
+                            {% elif ticket.priority == 'Low' %}
+                            <span class="badge bg-info p-2">Low</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-light">
+                        <div class="card-body">
+                            <h6 class="card-title text-muted">Assigned To</h6>
+                            <p class="mb-0">{{ agent.full_name if agent else 'Unassigned' }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-light">
+                        <div class="card-body">
+                            <h6 class="card-title text-muted">Last Updated</h6>
+                            <p class="mb-0">
+                                {% if ticket.updated_at %}
+                                    {% if ticket.updated_at is string %}
+                                        {{ ticket.updated_at[:10] }} at {{ ticket.updated_at[11:16] if ticket.updated_at|length > 16 else '' }}
+                                    {% else %}
+                                        {{ ticket.updated_at.strftime('%b %d, %Y at %H:%M') }}
+                                    {% endif %}
+                                {% else %}
+                                    {% if ticket.created_at is string %}
+                                        {{ ticket.created_at[:10] }} at {{ ticket.created_at[11:16] if ticket.created_at|length > 16 else '' }}
+                                    {% else %}
+                                        {{ ticket.created_at.strftime('%b %d, %Y at %H:%M') }}
+                                    {% endif %}
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Original Description -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-comment me-2"></i>Description
+                    <small class="text-muted ms-2">
+                        Posted on 
+                        {% if ticket.created_at is string %}
+                            {{ ticket.created_at[:10] }} at {{ ticket.created_at[11:16] if ticket.created_at|length > 16 else '' }}
+                        {% else %}
+                            {{ ticket.created_at.strftime('%B %d, %Y at %H:%M') }}
+                        {% endif %}
+                    </small>
+                </div>
+                <div class="card-body">
+                    <p class="mb-0" style="white-space: pre-wrap;">{{ ticket.description }}</p>
+                </div>
+            </div>
+
+            <!-- Messages Thread -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-comments me-2"></i>Conversation
+                </div>
+                <div class="card-body">
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="mb-4 {% if message.author_id == user.id %}text-end{% endif %}">
+                                <div class="d-inline-block {% if message.author_id == user.id %}bg-primary text-white{% else %}bg-light{% endif %} p-3 rounded-3" style="max-width: 80%;">
+                                    <div class="d-flex align-items-center mb-2 {% if message.author_id == user.id %}justify-content-end{% endif %}">
+                                        <strong class="me-2">
+                                            {% if message.author_id == user.id %}
+                                                You
+                                            {% else %}
+                                                {{ message.author.full_name if message.author else 'Support Agent' }}
+                                            {% endif %}
+                                        </strong>
+                                        <small class="{% if message.author_id == user.id %}text-white-50{% else %}text-muted{% endif %}">
+                                            {{ message.created_at.strftime('%b %d, %Y at %H:%M') }}
+                                        </small>
+                                    </div>
+                                    <p class="mb-0" style="white-space: pre-wrap;">{{ message.message }}</p>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted text-center mb-0">No messages yet. Be the first to reply!</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Reply Form -->
+            {% if ticket.status != 'Closed' %}
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-reply me-2"></i>Add Reply
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="/customer/ticket/{{ ticket.ticket_number }}/reply">
+                        <div class="mb-3">
+                            <textarea class="form-control" name="message" rows="4" 
+                                      placeholder="Type your reply here..." required></textarea>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-paper-plane me-2"></i>Send Reply
+                            </button>
+                            <small class="text-muted">
+                                <i class="fas fa-info-circle me-1"></i>
+                                Your reply will be sent to the support team
+                            </small>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            {% else %}
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle me-2"></i>
+                This ticket is closed. To reopen, click the "Reopen Ticket" button above.
+            </div>
+            {% endif %}
+
+            <!-- Internal Notes (Vulnerability Demonstration) -->
+            {% if ticket.internal_notes %}
+            <div class="card mt-4 border-danger">
+                <div class="card-header bg-danger text-white">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    Internal Notes - INFORMATION DISCLOSURE VULNERABILITY
+                </div>
+                <div class="card-body">
+                    <p class="text-danger mb-2">{{ ticket.internal_notes }}</p>
+                    <hr>
+                    <small class="text-muted">
+                        <i class="fas fa-shield-alt me-1"></i>
+                        These notes should only be visible to support agents, but due to an information disclosure vulnerability, they are exposed here.
+                    </small>
+                </div>
+            </div>
+            {% endif %}
+        </main>
+    </div>
+</div>
+
+<style>
+.sidebar {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 100;
+    padding: 48px 0 0;
+    box-shadow: inset -1px 0 0 rgba(0, 0, 0, .1);
+}
+
+@media (max-width: 768px) {
+    .sidebar {
+        position: static;
+        padding-top: 0;
+    }
+}
+
+.bg-primary.text-white .text-white-50 {
+    color: rgba(255, 255, 255, 0.5) !important;
+}
+
+.rounded-3 {
+    border-radius: 1rem !important;
+}
+</style>
+{% endblock %}

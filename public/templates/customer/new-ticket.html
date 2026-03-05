@@ -1,0 +1,290 @@
+{% extends "base.html" %}
+
+{% block title %}New Ticket - SwiftSupport{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar Navigation -->
+        <nav class="col-md-3 col-lg-2 d-md-block sidebar" style="background: #0E1825;">
+            <div class="position-sticky pt-3">
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/customer/dashboard">
+                            <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/customer/tickets">
+                            <i class="fas fa-ticket-alt me-2"></i>My Tickets
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/customer/new-ticket">
+                            <i class="fas fa-plus-circle me-2"></i>New Ticket
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/customer/knowledge-base">
+                            <i class="fas fa-book me-2"></i>Knowledge Base
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/customer/billing">
+                            <i class="fas fa-credit-card me-2"></i>Billing
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/customer/profile">
+                            <i class="fas fa-user me-2"></i>Profile
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                <h1 class="h2">Create New Support Ticket</h1>
+                <a href="/customer/tickets" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>Back to Tickets
+                </a>
+            </div>
+
+
+            <div class="row">
+                <div class="col-md-8">
+                    <!-- Main Ticket Form -->
+                    <div class="card">
+                        <div class="card-header">
+                            <i class="fas fa-edit me-2"></i>Ticket Details
+                        </div>
+                        <div class="card-body">
+                            <form method="POST" action="/customer/new-ticket" enctype="multipart/form-data">
+                                <!-- Subject -->
+                                <div class="mb-3">
+                                    <label for="subject" class="form-label">Subject <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="subject" name="subject" 
+                                           placeholder="Brief summary of your issue" required
+                                           value="{{ request.form.subject if request.form.subject else '' }}">
+                                    <small class="text-muted">Example: "Cannot access email account" or "Billing discrepancy"</small>
+                                </div>
+
+                                <!-- Category and Priority Row -->
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label for="category" class="form-label">Category <span class="text-danger">*</span></label>
+                                        <select class="form-select" id="category" name="category" required>
+                                            <option value="">Select a category</option>
+                                            <option value="Account" {% if request.form.category == 'Account' %}selected{% endif %}>Account Management</option>
+                                            <option value="Billing" {% if request.form.category == 'Billing' %}selected{% endif %}>Billing & Payments</option>
+                                            <option value="Technical" {% if request.form.category == 'Technical' %}selected{% endif %}>Technical Support</option>
+                                            <option value="Product" {% if request.form.category == 'Product' %}selected{% endif %}>Product Question</option>
+                                            <option value="Feature Request" {% if request.form.category == 'Feature Request' %}selected{% endif %}>Feature Request</option>
+                                            <option value="Bug Report" {% if request.form.category == 'Bug Report' %}selected{% endif %}>Bug Report</option>
+                                            <option value="Security" {% if request.form.category == 'Security' %}selected{% endif %}>Security Issue</option>
+                                            <option value="Other" {% if request.form.category == 'Other' %}selected{% endif %}>Other</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="priority" class="form-label">Priority</label>
+                                        <select class="form-select" id="priority" name="priority">
+                                            <option value="Low" {% if request.form.priority == 'Low' %}selected{% endif %}>Low - General question or minor issue</option>
+                                            <option value="Medium" {% if request.form.priority == 'Medium' or not request.form.priority %}selected{% endif %}>Medium - Normal support request</option>
+                                        </select>
+                                        <small class="text-muted">High priority requires urgent checkbox</small>
+                                    </div>
+                                </div>
+
+                                <!-- Rich Text Editor for Description -->
+                                <div class="mb-3">
+                                    <label for="description" class="form-label">Description <span class="text-danger">*</span></label>
+                                    <div class="border rounded">
+                                        <!-- Simple toolbar (visual only) -->
+                                        <div class="bg-light p-2 border-bottom">
+                                            <button type="button" class="btn btn-sm btn-light" onclick="insertFormat('**', '**')"><i class="fas fa-bold"></i></button>
+                                            <button type="button" class="btn btn-sm btn-light" onclick="insertFormat('*', '*')"><i class="fas fa-italic"></i></button>
+                                            <button type="button" class="btn btn-sm btn-light" onclick="insertFormat('```\n', '\n```')"><i class="fas fa-code"></i></button>
+                                            <button type="button" class="btn btn-sm btn-light" onclick="insertBullet()"><i class="fas fa-list-ul"></i></button>
+                                            <button type="button" class="btn btn-sm btn-light" onclick="insertNumber()"><i class="fas fa-list-ol"></i></button>
+                                        </div>
+                                        <textarea class="form-control border-0" id="description" name="description" rows="8" 
+                                                  placeholder="Please provide detailed information about your issue..." required>{{ request.form.description if request.form.description else '' }}</textarea>
+                                    </div>
+                                    <small class="text-muted">
+                                        Include: steps to reproduce, error messages, when it started, what you've tried
+                                    </small>
+                                </div>
+
+                                <!-- File Attachment Upload - VULNERABLE! -->
+                                <div class="mb-3">
+                                    <label for="attachments" class="form-label">
+                                        Attachments 
+                                    </label>
+                                    <input type="file" class="form-control" id="attachments" name="attachments">
+                                    <small class="text-muted">                                        
+                                        <br>
+                                        Accepted: PNG, JPG, GIF, PDF, TXT, LOG, ZIP (Max 10MB)
+                                    </small>
+                                </div>
+
+                                <!-- Impact on Business Field -->
+                                <div class="mb-3">
+                                    <label for="impact" class="form-label">Impact on Business</label>
+                                    <select class="form-select" id="impact" name="impact">
+                                        <option value="">Select impact level</option>
+                                        <option value="individual">Individual user affected</option>
+                                        <option value="team">Team/Department affected</option>
+                                        <option value="department">Multiple departments affected</option>
+                                        <option value="company">Company-wide impact</option>
+                                        <option value="customer">Customer-facing impact</option>
+                                    </select>
+                                </div>
+
+                                <!-- Related Ticket -->
+                                <div class="mb-3">
+                                    <label for="related_ticket" class="form-label">Related Ticket (Optional)</label>
+                                    <input type="text" class="form-control" id="related_ticket" name="related_ticket" 
+                                           placeholder="e.g., SUP-2024-001"
+                                           value="{{ request.form.related_ticket if request.form.related_ticket else '' }}">
+                                    <small class="text-muted">If this is related to an existing ticket, enter the ticket number</small>
+                                </div>
+
+                                <!-- Urgent Checkbox -->
+                                <div class="mb-3 form-check">
+                                    <input type="checkbox" class="form-check-input" id="urgent" name="urgent" 
+                                           {% if request.form.urgent %}checked{% endif %}>
+                                    <label class="form-check-label" for="urgent">
+                                        <i class="fas fa-exclamation-triangle text-danger me-1"></i>
+                                        This is a production outage or critical business issue
+                                        <span class="badge bg-danger">Priority will be set to High</span>
+                                    </label>
+                                </div>
+
+                                <!-- Submit Buttons -->
+                                <hr>
+                                <div class="d-flex justify-content-between">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-paper-plane me-2"></i>Submit Ticket
+                                    </button>
+                                    <button type="reset" class="btn btn-outline-secondary">
+                                        <i class="fas fa-undo me-2"></i>Reset Form
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Sidebar - Help Information -->
+                <div class="col-md-4">
+
+                    <!-- Before You Submit Card -->
+                    <div class="card mb-4">
+                        <div class="card-header bg-info text-white">
+                            <i class="fas fa-info-circle me-2"></i>Before You Submit
+                        </div>
+                        <div class="card-body">
+                            <h6>Check our Knowledge Base first:</h6>
+                            <p class="small">Many common issues have solutions in our knowledge base.</p>
+                            <a href="/customer/knowledge-base" class="btn btn-outline-info btn-sm w-100 mb-3">
+                                <i class="fas fa-book me-2"></i>Search Knowledge Base
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Support Hours Card -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <i class="fas fa-clock me-2"></i>Support Hours
+                        </div>
+                        <div class="card-body">
+                            <table class="table table-sm">
+                                <tr><td>Monday - Friday:</td><td>24/7</td></tr>
+                                <tr><td>Saturday:</td><td>8AM - 8PM EST</td></tr>
+                                <tr><td>Sunday:</td><td>10AM - 6PM EST</td></tr>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- SLA Information -->
+                    <div class="card">
+                        <div class="card-header">
+                            <i class="fas fa-chart-line me-2"></i>Expected Response Times
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-unstyled">
+                                <li class="mb-2"><span class="badge bg-danger">High</span> <span class="float-end">2 hours</span></li>
+                                <li class="mb-2"><span class="badge bg-warning">Medium</span> <span class="float-end">8 hours</span></li>
+                                <li class="mb-2"><span class="badge bg-info">Low</span> <span class="float-end">24 hours</span></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<!-- JavaScript for rich text editor helpers -->
+<script>
+function insertFormat(before, after) {
+    const textarea = document.getElementById('description');
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const selectedText = textarea.value.substring(start, end);
+    const newText = before + selectedText + after;
+    textarea.value = textarea.value.substring(0, start) + newText + textarea.value.substring(end);
+}
+
+function insertBullet() {
+    insertFormat('- ', '\n');
+}
+
+function insertNumber() {
+    insertFormat('1. ', '\n');
+}
+
+// Warn about directory traversal in file upload
+document.getElementById('attachments').addEventListener('change', function(e) {
+    if (this.files.length > 0) {
+        const filename = this.files[0].name;
+        if (filename.includes('../') || filename.includes('..\\')) {
+            if (!confirm('Warning: This filename contains path traversal characters (../). This is a security vulnerability demonstration. Continue?')) {
+                this.value = '';
+            }
+        }
+    }
+});
+</script>
+
+<style>
+.sidebar {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 100;
+    padding: 48px 0 0;
+    box-shadow: inset -1px 0 0 rgba(0, 0, 0, .1);
+}
+
+@media (max-width: 768px) {
+    .sidebar {
+        position: static;
+        padding-top: 0;
+    }
+}
+
+/* Rich text editor styling */
+.bg-light.p-2 .btn-light {
+    border: none;
+    margin-right: 2px;
+}
+
+.bg-light.p-2 .btn-light:hover {
+    background-color: #e9ecef !important;
+}
+</style>
+{% endblock %}

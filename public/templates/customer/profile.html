@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block title %}My Profile - SwiftSupport{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body text-center">
+                    <img src="https://via.placeholder.com/150" class="rounded-circle mb-3" alt="Profile Picture">
+                    <h5>{{ user.full_name }}</h5>
+                    <p class="text-muted">@{{ user.username }}</p>
+                    <p>
+                        <span class="badge bg-success">{{ user.account_type|title }} Account</span>
+                        {% if user.is_verified %}
+                        <span class="badge bg-info">Verified</span>
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-9">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Profile Information</h5>
+                </div>
+                <div class="card-body">
+                    <form>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Full Name</label>
+                                <input type="text" class="form-control" value="{{ user.full_name }}" readonly>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Email</label>
+                                <input type="email" class="form-control" value="{{ user.email }}" readonly>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Company</label>
+                                <input type="text" class="form-control" value="{{ user.company or 'N/A' }}" readonly>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Phone</label>
+                                <input type="text" class="form-control" value="{{ user.phone or 'N/A' }}" readonly>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Address</label>
+                            <textarea class="form-control" rows="2" readonly>{{ user.address or '' }}{% if user.city %}, {{ user.city }}{% endif %}{% if user.state %}, {{ user.state }}{% endif %} {{ user.zip_code or '' }}</textarea>
+                        </div>
+                        
+                        <hr>
+                        
+                        <h6>Billing Information (Hidden from display for security)</h6>
+                        <p class="text-muted">This information is stored securely in our database.</p>
+                        
+                        <a href="/customer/dashboard" class="btn btn-secondary">Back to Dashboard</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

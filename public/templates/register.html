@@ -1,0 +1,196 @@
+{% extends "base.html" %}
+
+{% block title %}Register - SwiftSupport{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow-lg border-0 rounded-lg">
+            <div class="card-header bg-white text-center py-4">
+                <h3 class="mb-0"><i class="fas fa-user-plus me-2"></i>Customer Registration</h3>
+                <p class="text-muted mt-2">Create your support portal account</p>
+            </div>
+            <div class="card-body p-4">
+                <!-- Security Notice -->
+                <div class="alert alert-warning mb-4">
+                    <i class="fas fa-info-circle me-2"></i>
+                    <strong>Note:</strong> All information is securely stored and encrypted. 
+                    (This is a demo application - do not use real personal information!)
+                </div>
+                
+                <form method="POST" action="/register">
+                    <!-- Account Type -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <label class="form-label fw-bold">Account Type</label>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="account_type" id="individual" value="individual" checked>
+                                <label class="form-check-label" for="individual">Individual</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="account_type" id="business" value="business">
+                                <label class="form-check-label" for="business">Business</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Account Information -->
+                    <h5 class="mb-3">Account Information</h5>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label for="username" class="form-label">Username <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="username" name="username" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="email" class="form-label">Email Address <span class="text-danger">*</span></label>
+                            <input type="email" class="form-control" id="email" name="email" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="password" class="form-label">Password <span class="text-danger">*</span></label>
+                            <input type="password" class="form-control" id="password" name="password" required>
+                            <small class="text-muted">Minimum 8 characters</small>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="confirm_password" class="form-label">Confirm Password <span class="text-danger">*</span></label>
+                            <input type="password" class="form-control" id="confirm_password" name="confirm_password" required>
+                        </div>
+                    </div>
+                    
+                    <!-- Personal Information -->
+                    <h5 class="mb-3">Personal Information</h5>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label for="full_name" class="form-label">Full Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="full_name" name="full_name" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="company" class="form-label">Company Name</label>
+                            <input type="text" class="form-control" id="company" name="company">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="phone" class="form-label">Phone Number</label>
+                            <input type="tel" class="form-control" id="phone" name="phone" placeholder="(555) 123-4567">
+                        </div>
+                    </div>
+                    
+                    <!-- Billing Information (Sensitive Data Section) -->
+                    <h5 class="mb-3 text-danger">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Billing Information (Required for Verification)
+                    </h5>
+                    <div class="alert alert-secondary mb-3">
+                        <small>We need this information to verify your identity and process payments for premium support.</small>
+                    </div>
+                    
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label for="ssn" class="form-label">Social Security Number (SSN)</label>
+                            <input type="text" class="form-control" id="ssn" name="ssn" placeholder="XXX-XX-XXXX">
+                            <small class="text-muted">Format: 123-45-6789</small>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="credit_card" class="form-label">Credit Card Number</label>
+                            <input type="text" class="form-control" id="credit_card" name="credit_card" placeholder="4111-1111-1111-1111">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="card_expiry" class="form-label">Expiry Date</label>
+                            <input type="text" class="form-control" id="card_expiry" name="card_expiry" placeholder="MM/YY">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="card_cvv" class="form-label">CVV</label>
+                            <input type="text" class="form-control" id="card_cvv" name="card_cvv" placeholder="123">
+                        </div>
+                    </div>
+                    
+                    <!-- Address Information -->
+                    <h5 class="mb-3">Address Information</h5>
+                    <div class="row g-3 mb-4">
+                        <div class="col-12">
+                            <label for="address" class="form-label">Street Address</label>
+                            <input type="text" class="form-control" id="address" name="address" placeholder="123 Main St">
+                        </div>
+                        <div class="col-md-5">
+                            <label for="city" class="form-label">City</label>
+                            <input type="text" class="form-control" id="city" name="city">
+                        </div>
+                        <div class="col-md-3">
+                            <label for="state" class="form-label">State</label>
+                            <select class="form-select" id="state" name="state">
+                                <option value="">Select State</option>
+                                <option value="CA">California</option>
+                                <option value="NY">New York</option>
+                                <option value="TX">Texas</option>
+                                <option value="FL">Florida</option>
+                                <option value="IL">Illinois</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label for="zip_code" class="form-label">ZIP Code</label>
+                            <input type="text" class="form-control" id="zip_code" name="zip_code">
+                        </div>
+                        <div class="col-md-2">
+                            <label for="country" class="form-label">Country</label>
+                            <select class="form-select" id="country" name="country">
+                                <option value="USA">USA</option>
+                                <option value="CAN">Canada</option>
+                                <option value="MEX">Mexico</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <!-- Terms and Conditions -->
+                    <div class="mb-4 form-check">
+                        <input type="checkbox" class="form-check-input" id="terms" required>
+                        <label class="form-check-label" for="terms">
+                            I agree to the <a href="#" class="text-decoration-none">Terms of Service</a> and 
+                            <a href="#" class="text-decoration-none">Privacy Policy</a>. 
+                            I confirm that the information provided is accurate.
+                        </label>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="fas fa-user-plus me-2"></i>Create Account
+                        </button>
+                    </div>
+                </form>
+                
+                <div class="text-center mt-3">
+                    Already have an account? <a href="/" class="text-decoration-none">Login here</a>
+                </div>
+            </div>
+            
+            <!-- Security Badges -->
+            <div class="card-footer bg-white py-3">
+                <div class="row text-center">
+                    <div class="col-4">
+                        <i class="fas fa-lock text-success"></i>
+                        <small class="d-block">256-bit Encryption</small>
+                    </div>
+                    <div class="col-4">
+                        <i class="fas fa-shield-alt text-success"></i>
+                        <small class="d-block">PCI Compliant</small>
+                    </div>
+                    <div class="col-4">
+                        <i class="fas fa-check-circle text-success"></i>
+                        <small class="d-block">GDPR Ready</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Simple password match validation (client-side only)
+document.querySelector('form').addEventListener('submit', function(e) {
+    const password = document.getElementById('password').value;
+    const confirm = document.getElementById('confirm_password').value;
+    
+    if (password !== confirm) {
+        e.preventDefault();
+        alert('Passwords do not match!');
+    }
+});
+</script>
+{% endblock %}

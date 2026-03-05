@@ -1,0 +1,342 @@
+{% extends "base.html" %}
+
+{% block title %}My Tickets - SwiftSupport{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar Navigation -->
+        <nav class="col-md-3 col-lg-2 d-md-block sidebar" style="background: #0E1825;">
+            <div class="position-sticky pt-3">
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/customer/dashboard">
+                            <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/customer/tickets">
+                            <i class="fas fa-ticket-alt me-2"></i>My Tickets
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/customer/new-ticket">
+                            <i class="fas fa-plus-circle me-2"></i>New Ticket
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/customer/knowledge-base">
+                            <i class="fas fa-book me-2"></i>Knowledge Base
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/customer/billing">
+                            <i class="fas fa-credit-card me-2"></i>Billing
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/customer/profile">
+                            <i class="fas fa-user me-2"></i>Profile
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+            <!-- Top Navigation Bar -->
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                <h1 class="h2">My Support Tickets</h1>
+                <div class="btn-toolbar mb-2 mb-md-0">
+                    <a href="/customer/new-ticket" class="btn btn-primary me-2">
+                        <i class="fas fa-plus-circle me-2"></i>New Ticket
+                    </a>
+                </div>
+            </div>
+
+            <!-- Filters Card -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-filter me-2"></i>Filter Tickets
+                    <button class="btn btn-sm btn-outline-secondary float-end" type="button" data-bs-toggle="collapse" data-bs-target="#filterCollapse">
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                </div>
+                <div class="collapse show" id="filterCollapse">
+                    <div class="card-body">
+                        <form method="GET" action="/customer/tickets" id="filterForm">
+                            <!-- Search Bar -->
+                            <div class="row mb-3">
+                                <div class="col-md-12">
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-search"></i></span>
+                                        <input type="text" class="form-control" name="search" 
+                                               placeholder="Search by ticket #, subject, or description..." 
+                                               value="{{ filters.search }}">
+                                        <button class="btn btn-primary" type="submit">Search</button>
+                                    </div>
+                                    
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <!-- Status Filter -->
+                                <div class="col-md-3 mb-2">
+                                    <label class="form-label">Status</label>
+                                    <select class="form-select" name="status">
+                                        <option value="all" {% if filters.status == 'all' %}selected{% endif %}>All Status</option>
+                                        <option value="Open" {% if filters.status == 'Open' %}selected{% endif %}>Open</option>
+                                        <option value="In Progress" {% if filters.status == 'In Progress' %}selected{% endif %}>In Progress</option>
+                                        <option value="Resolved" {% if filters.status == 'Resolved' %}selected{% endif %}>Resolved</option>
+                                        <option value="Closed" {% if filters.status == 'Closed' %}selected{% endif %}>Closed</option>
+                                    </select>
+                                </div>
+                                
+                                <!-- Priority Filter -->
+                                <div class="col-md-3 mb-2">
+                                    <label class="form-label">Priority</label>
+                                    <select class="form-select" name="priority">
+                                        <option value="all" {% if filters.priority == 'all' %}selected{% endif %}>All Priority</option>
+                                        <option value="High" {% if filters.priority == 'High' %}selected{% endif %}>High</option>
+                                        <option value="Medium" {% if filters.priority == 'Medium' %}selected{% endif %}>Medium</option>
+                                        <option value="Low" {% if filters.priority == 'Low' %}selected{% endif %}>Low</option>
+                                    </select>
+                                </div>
+                                
+                                <!-- Category Filter -->
+                                <div class="col-md-3 mb-2">
+                                    <label class="form-label">Category</label>
+                                    <select class="form-select" name="category">
+                                        <option value="all" {% if filters.category == 'all' %}selected{% endif %}>All Categories</option>
+                                        {% for category in categories %}
+                                        <option value="{{ category }}" {% if filters.category == category %}selected{% endif %}>{{ category }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                
+                                <!-- Sort By -->
+                                <div class="col-md-3 mb-2">
+                                    <label class="form-label">Sort By</label>
+                                    <select class="form-select" name="sort_by">
+                                        <option value="newest" {% if filters.sort_by == 'newest' %}selected{% endif %}>Newest First</option>
+                                        <option value="oldest" {% if filters.sort_by == 'oldest' %}selected{% endif %}>Oldest First</option>
+                                        <option value="last_updated" {% if filters.sort_by == 'last_updated' %}selected{% endif %}>Last Updated</option>
+                                        <option value="priority_high" {% if filters.sort_by == 'priority_high' %}selected{% endif %}>Priority (High to Low)</option>
+                                        <option value="priority_low" {% if filters.sort_by == 'priority_low' %}selected{% endif %}>Priority (Low to High)</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <!-- Date Range -->
+                                <div class="col-md-4 mb-2">
+                                    <label class="form-label">From Date</label>
+                                    <input type="date" class="form-control" name="date_from" value="{{ filters.date_from }}">
+                                </div>
+                                <div class="col-md-4 mb-2">
+                                    <label class="form-label">To Date</label>
+                                    <input type="date" class="form-control" name="date_to" value="{{ filters.date_to }}">
+                                </div>
+                                <div class="col-md-4 mb-2 d-flex align-items-end">
+                                    <button type="submit" class="btn btn-primary me-2">Apply Filters</button>
+                                    <a href="/customer/tickets" class="btn btn-outline-secondary">Clear All</a>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tickets Table -->
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-list me-2"></i>Tickets List
+                    <span class="badge bg-primary float-end">{{ pagination.total }} Total</span>
+                </div>
+                <div class="card-body">
+                    {% if tickets %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Ticket #</th>
+                                    <th>Subject</th>
+                                    <th>Category</th>
+                                    <th>Status</th>
+                                    <th>Priority</th>
+                                    <th>Last Updated</th>
+                                    <th>Assigned To</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for ticket in tickets %}
+                                <tr>
+                                    <td>
+                                        <span class="fw-bold">{{ ticket.ticket_number }}</span>
+                                    </td>
+                                    <td>
+                                        <a href="/customer/ticket/{{ ticket.ticket_number }}" class="text-decoration-none">
+                                            {{ ticket.subject[:50] }}{% if ticket.subject|length > 50 %}...{% endif %}
+                                        </a>
+                                    </td>
+                                    <td><span class="badge bg-secondary">{{ ticket.category }}</span></td>
+                                    <td>
+                                        {% if ticket.status == 'Open' %}
+                                        <span class="badge bg-warning">Open</span>
+                                        {% elif ticket.status == 'In Progress' %}
+                                        <span class="badge bg-info">In Progress</span>
+                                        {% elif ticket.status == 'Resolved' %}
+                                        <span class="badge bg-success">Resolved</span>
+                                        {% elif ticket.status == 'Closed' %}
+                                        <span class="badge bg-secondary">Closed</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if ticket.priority == 'High' %}
+                                        <span class="badge bg-danger">High</span>
+                                        {% elif ticket.priority == 'Medium' %}
+                                        <span class="badge bg-warning">Medium</span>
+                                        {% elif ticket.priority == 'Low' %}
+                                        <span class="badge bg-info">Low</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if ticket.updated_at %}
+                                            {% if ticket.updated_at is string %}
+                                                {{ ticket.updated_at[:10] }} {{ ticket.updated_at[11:16] if ticket.updatedated_at|length > 16 else '' }}
+                                            {% else %}
+                                                {{ ticket.updated_at.strftime('%Y-%m-%d %H:%M') }}
+                                            {% endif %}
+                                        {% else %}
+                                            {% if ticket.created_at is string %}
+                                                {{ ticket.created_at[:10] }} {{ ticket.created_at[11:16] if ticket.created_at|length > 16 else '' }}
+                                            {% else %}
+                                                {{ ticket.created_at.strftime('%Y-%m-%d %H:%M') }}
+                                            {% endif %}
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if ticket.assigned_to %}
+                                            {{ agents.get(ticket.assigned_to, 'Support Agent') }}
+                                        {% else %}
+                                            <span class="text-muted">Unassigned</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <a href="/customer/ticket/{{ ticket.ticket_number }}" class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination -->
+                    {% if pagination.pages > 1 %}
+                    <nav aria-label="Ticket pagination">
+                        <ul class="pagination justify-content-center">
+                            <li class="page-item {% if pagination.page == 1 %}disabled{% endif %}">
+                                <a class="page-link" href="{{ url_for('customer_tickets', page=pagination.page-1, **filters) }}">
+                                    Previous
+                                </a>
+                            </li>
+                            
+                            {% for p in range(1, pagination.pages + 1) %}
+                                {% if p >= pagination.page - 2 and p <= pagination.page + 2 %}
+                                <li class="page-item {% if p == pagination.page %}active{% endif %}">
+                                    <a class="page-link" href="{{ url_for('customer_tickets', page=p, **filters) }}">{{ p }}</a>
+                                </li>
+                                {% endif %}
+                            {% endfor %}
+                            
+                            <li class="page-item {% if pagination.page == pagination.pages %}disabled{% endif %}">
+                                <a class="page-link" href="{{ url_for('customer_tickets', page=pagination.page+1, **filters) }}">
+                                    Next
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                    <p class="text-center text-muted small">
+                        Showing page {{ pagination.page }} of {{ pagination.pages }} ({{ pagination.total }} total tickets)
+                    </p>
+                    {% endif %}
+                    
+                    {% else %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-ticket-alt fa-4x text-muted mb-3"></i>
+                        <h5>No tickets found</h5>
+                        <p class="text-muted">Try adjusting your filters or create a new ticket.</p>
+                        <a href="/customer/new-ticket" class="btn btn-primary">
+                            <i class="fas fa-plus-circle me-2"></i>Create New Ticket
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<!-- Keep filters in URL when sorting/paginating -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    
+    // Auto-submit form when filters change
+    document.querySelectorAll('select[name="status"], select[name="priority"], select[name="category"], select[name="sort_by"]').forEach(select => {
+        select.addEventListener('change', function() {
+            document.getElementById('filterForm').submit();
+        });
+    });
+    
+    // Date inputs - submit when changed
+    document.querySelectorAll('input[type="date"]').forEach(input => {
+        input.addEventListener('change', function() {
+            document.getElementById('filterForm').submit();
+        });
+    });
+});
+</script>
+
+<style>
+.table th {
+    background-color: #f8f9fa;
+    font-weight: 600;
+}
+.table td {
+    vertical-align: middle;
+}
+.pagination .page-link {
+    color: #589AB6;
+}
+.pagination .active .page-link {
+    background-color: #589AB6;
+    border-color: #589AB6;
+}
+code {
+    background-color: #f8f9fa;
+    padding: 2px 4px;
+    border-radius: 4px;
+    color: #dc3545;
+}
+.sidebar {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 100;
+    padding: 48px 0 0;
+    box-shadow: inset -1px 0 0 rgba(0, 0, 0, .1);
+}
+
+@media (max-width: 768px) {
+    .sidebar {
+        position: static;
+        padding-top: 0;
+    }
+}
+</style>
+{% endblock %}
